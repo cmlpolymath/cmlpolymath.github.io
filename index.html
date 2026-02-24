@@ -1,166 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Animation</title>
-    <style>
-        /* TailwindCSS - Minimal Styles */
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 90vh;
-            margin: 0;
-            background-color: #1a202c;
-            overflow: hidden;
-            font-family: 'cambria', sans-serif;
-            line-height: 1.6;
-            font-size: 18px;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 20px;
-            position: relative;
-        }
-        #rain-container {
-            position: absolute;
-            top: 0; 
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CML Polymath Notebooks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1410;
+      --parchment: #f5efe6;
+      --aged: #e8dcc8;
+      --gold: #c9a84c;
+      --gold-light: #f0d080;
+      --rust: #8b3a2a;
+      --forest: #2d4a2d;
+      --muted: #7a6a5a;
+      --shadow: rgba(26,20,16,0.18);
+    }
 
-        .book {
-            position: absolute;
-            bottom: 100%;
-            font-size: 3rem;
-            animation: fall linear infinite;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
-        }
+    body {
+      background: var(--ink);
+      font-family: 'Crimson Pro', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .notebook-cover {
-            text-align: center;
-            padding: 20px;
-            background-color: #b2e2f8;
-            color: #333;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,.3);
-            margin-bottom: 30px;
-            opacity: 0.98; /* Adjust this value to change transparency */
-        }
-        h1 {
-            color: #556b2f;
-            font-size: 1.5rem;
-            margin-top: 0;
-        }
-        @keyframes fadeInScale {
-            0% {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+    /* Falling books background */
+    #rain-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .book-drop {
+      position: absolute;
+      bottom: 110%;
+      font-size: clamp(1.2rem, 3vw, 2.2rem);
+      animation: fall linear infinite;
+      opacity: 0.25;
+      filter: blur(0.5px);
+    }
+    @keyframes fall {
+      to { transform: translateY(120vh) rotate(20deg); }
+    }
 
-        h1 span {
-            display: inline-block;
-            opacity: 0;
-            animation: fadeInScale 1.5s ease forwards;
-            color: #daa520;
-        }
-        .section-title {
-            color: #41339c;
-            margin-top: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 10px;
-        }
+    /* Decorative grid lines */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 768px) {
-            .notebook-cover {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.2rem;
-            }
-            .section-title {
-                font-size: 1rem;
-            }
-        }
-        @media (max-width: 480px) {
-            body {
-                font-size: 16px;
-            }
-            .notebook-cover {
-                padding: 10px;
-                margin: 0 10px;
-            }
-            h1 {
-                font-size: 1rem;
-            }
-            .section-title {
-                font-size: 0.9rem;
-            }
-        }
+    /* Page wrapper */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
 
-    </style>
+    /* Main card — aged parchment look */
+    .card {
+      background: var(--parchment);
+      max-width: 760px;
+      width: 100%;
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 1px rgba(201,168,76,0.5),
+        0 0 0 6px rgba(201,168,76,0.1),
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 120px rgba(201,168,76,0.06);
+      overflow: hidden;
+      animation: riseIn 1s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Header band */
+    .card-header {
+      background: var(--ink);
+      padding: 36px 48px 30px;
+      text-align: center;
+      position: relative;
+      border-bottom: 3px solid var(--gold);
+    }
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: -9px; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 14px;
+      background: var(--gold);
+      clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+    }
+
+    .eyebrow {
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.7rem;
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s ease forwards;
+    }
+    .title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-weight: 700;
+      color: var(--parchment);
+      line-height: 1.15;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.5s ease forwards;
+    }
+    .title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .subtitle {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.7s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CTA button */
+    .cta-wrap {
+      margin-top: 26px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.9s ease forwards;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(201,168,76,0.25);
+    }
+    .cta-btn:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201,168,76,0.4);
+    }
+    .cta-btn svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* Body content */
+    .card-body {
+      padding: 44px 48px;
+      background: var(--parchment);
+      position: relative;
+    }
+    /* Faint ruled lines like real notebook paper */
+    .card-body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        rgba(139,58,42,0.08) 32px
+      );
+      background-size: 100% 32px;
+      background-position: 0 44px;
+      pointer-events: none;
+    }
+
+    .intro {
+      font-size: 1.12rem;
+      color: #3a2e26;
+      line-height: 1.8;
+      margin-bottom: 32px;
+      position: relative;
+    }
+    .intro strong { color: var(--rust); font-weight: 600; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 28px 0;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .divider span {
+      font-size: 1.2rem;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .section-label {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--forest);
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    /* Notebook section cards */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      position: relative;
+    }
+    .section-item {
+      background: white;
+      border: 1px solid var(--aged);
+      border-left: 3px solid var(--gold);
+      padding: 16px 18px;
+      border-radius: 2px;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .section-item:hover {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    .section-item strong {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+      letter-spacing: 0.01em;
+    }
+    .section-item span {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 32px;
+      text-align: center;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--muted);
+      position: relative;
+    }
+
+    /* Card footer */
+    .card-footer {
+      background: var(--aged);
+      border-top: 1px solid rgba(201,168,76,0.3);
+      padding: 16px 48px;
+      text-align: center;
+    }
+    .card-footer a {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .card-footer a:hover { color: var(--rust); }
+
+    @media (max-width: 580px) {
+      .card-header, .card-body { padding: 28px 24px; }
+      .card-footer { padding: 14px 24px; }
+      .sections-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <div id="rain-container"></div>
-    <script>
-        const rainContainer = document.getElementById('rain-container');
 
-        function createBook() {
-            const book = document.createElement('div');
-            book.className = 'book';
-            book.style.left = `${Math.random() * 100}vw`;
-            book.style.animationDuration = `${Math.random() * 3 + 3}s`;
-            book.textContent = Math.random() > 0.5 ? '📖' : '📒';
-            rainContainer.appendChild(book);
+  <div id="rain-container"></div>
 
-            setTimeout(() => {
-                book.remove();
-            }, (Math.random() * 2 + 2) * 1000);
-        }
+  <div class="page">
+    <div class="card">
 
-        setInterval(createBook, 100);
-    </script>
-    <div class="container">
-        <div class="notebook-cover">
-            <h1><span><a href="https://github.com/cmlpolymath/Notebooks/tree/main" style="color:#daa520; text-decoration: none;">✨ CML Polymath Notebooks ✨</a></span></h1>
-            <p>Welcome to this repository, which contains all the notebooks based on Data Science books I've read.
-                    The purpose of this repository is to show my journey through the field and, most importantly, <b>to share the knowledge.</b>
-            </p>
-            
-            <hr>
-
-            <p class="section-title">Each series of notebooks is dedicated to a specific book and contains the following sections:</p>
-
-            <ul>
-                <li><strong>Book Information:</strong> <em>Title, Author, Publication Year,</em> and a brief summary.</li>
-                <li><strong>Key Takeaways:</strong> The most important points and ideas from the book.</li>
-                <li><strong>General Notes:</strong> Terms, caveats, and the code written step-by-step</li>
-                <li><strong>Discussion:</strong> Comments about the material to spark conversation</li>
-            </ul>
-
-            <p>Come explore the notebooks, contribute your own insights, and join the discussion. <i>Happy reading!</i></p>
+      <!-- Header -->
+      <div class="card-header">
+        <p class="eyebrow">Data Science · Machine Learning · Knowledge</p>
+        <h1 class="title"><em>CML Polymath</em> Notebooks</h1>
+        <p class="subtitle">A curated library of book notes, takeaways &amp; code</p>
+        <div class="cta-wrap">
+          <a class="cta-btn" href="https://github.com/cmlpolymath/Notebooks/tree/main" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+            Browse the Repository
+          </a>
         </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <p class="intro">
+          Welcome to a growing collection of notebooks documenting my journey through
+          Data Science literature — written to <strong>share knowledge</strong>, not just collect it.
+          Each book gets its own series, structured to help you learn alongside me.
+        </p>
+
+        <div class="divider"><span>✦</span></div>
+
+        <p class="section-label">Every notebook series covers:</p>
+
+        <div class="sections-grid">
+          <div class="section-item">
+            <strong>📚 Book Information</strong>
+            <span>Title, author, year &amp; a concise summary to orient you</span>
+          </div>
+          <div class="section-item">
+            <strong>💡 Key Takeaways</strong>
+            <span>The most important ideas, distilled and ready to use</span>
+          </div>
+          <div class="section-item">
+            <strong>🗒 General Notes</strong>
+            <span>Terms, caveats, and step-by-step code walkthroughs</span>
+          </div>
+          <div class="section-item">
+            <strong>💬 Discussion</strong>
+            <span>Reflections and open questions to spark conversation</span>
+          </div>
+        </div>
+
+        <p class="footer-note">
+          Explore the notebooks, contribute your own insights, and join the discussion —<br>
+          <em>Happy reading!</em> 📖
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        <a href="https://github.com/cmlpolymath" target="_blank" rel="noopener">github.com/cmlpolymath</a>
+      </div>
+
     </div>
+  </div>
+
+  <script>
+    const rain = document.getElementById('rain-container');
+    const emojis = ['📖','📒','📗','📘','📙','📚'];
+    function drop() {
+      const el = document.createElement('div');
+      el.className = 'book-drop';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      el.style.animationDelay = '0s';
+      el.style.fontSize = (Math.random() * 1.2 + 1) + 'rem';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      rain.appendChild(el);
+      setTimeout(() => el.remove(), 11000);
+    }
+    setInterval(drop, 350);
+  </script>
 </body>
 </html>
