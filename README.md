@@ -1,2 +1,1 @@
-https://cmlpolymath.github.io/gh-pages/
-# link to site
+<a href> https://cmlpolymath.github.io </a>
